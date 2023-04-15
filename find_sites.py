@@ -1,16 +1,13 @@
 import pandas as pd
 import requests
 import sys
-sys.path.append('/Users/olivia/main/research/atmospheric_chem_ML/chem150')
+sys.path.append('/Users/Helen Chen/OneDrive/Documents/HMC/Chem150/atmospheric_chem_ML')
 # it says import can't be resolved but it resolves in a notebook? 
 from data_fetcher import DataFetcher
 import numpy as np
 import pandas as pd
 
-CRITERIA_POLLUTANTS = ["Carbon monoxide", "Nitrogen dioxide (NO2)", "Ozone", "PM2.5 - Local Conditions"]
-PAMS = ["Nitric oxide (NO)", "Oxides of nitrogen (NOx)"]
-MET_VARS = ["Wind Direction - Resultant", "Wind Direction - Scalar", "Wind Speed - Resultant", "Wind Speed - Scalar", "Outdoor Temperature", "Relative Humidity ", "Solar radiation", "Ultraviolet radiation", "Barometric pressure"] 
-CURR_VARS = ["Carbon monoxide", "Nitrogen dioxide (NO2)", "PM2.5 - Local Conditions"] + MET_VARS
+PM2_dot_5_VARS = ["PM2.5 - Local Conditions","PM2.5 STP","PM2.5 Total Atmospheric","PM2.5 Raw Data"]
 
 MONITORS_BY_STATE = 'monitors/byState'
 ANNUAL_DATA_BY_SITE = 'annualData/bySite'
