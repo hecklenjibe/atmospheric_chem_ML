@@ -1,7 +1,7 @@
 import pandas as pd
 import requests
 import sys
-sys.path.append('/Users/Helen Chen/OneDrive/Documents/HMC/Chem150/atmospheric_chem_ML')
+sys.path.append('/Users/Helen Chen/OneDrive/Documents/HMC/Chem150')
 # it says import can't be resolved but it resolves in a notebook? 
 from data_fetcher import DataFetcher
 import numpy as np
@@ -43,26 +43,25 @@ class findSites():
             return df
 
         # turns start dates into years 
-        df["open_date"] = df["open_date"].map(lambda date: int(str(date)[:4])) 
-        # sorts so that the earliest ozone collection date is before 1980
-        # df = df[df["open_date"] < byear]
-        # df = df.reset_index()
+        # df["open_date"] = df["open_date"].map(lambda date: int(str(date)[:4])) 
+        # # sorts so that the earliest ozone collection date is before 1980
+        # # df = df[df["open_date"] < byear]
+        # # df = df.reset_index()
 
-        # finds data within the correct year range
-        if eyear == None:
-            df = df.fillna(value='None')
-            df = df[df["close_date"] == 'None']
-        else:
-            df = df.fillna(value="9999")
-            df["close_date"] = df["close_date"].map(lambda date: int(str(date)[:4])) 
-            df = df[df["close_date"] > eyear]
-            df = df.replace(to_replace=9999, value='None') 
+        # # finds data within the correct year range
+        # if eyear == None:
+        #     df = df.fillna(value='None')
+        #     df = df[df["close_date"] == 'None']
+        # else:
+        #     df = df.fillna(value="9999")
+        #     df["close_date"] = df["close_date"].map(lambda date: int(str(date)[:4])) 
+        #     df = df[df["close_date"] > eyear]
+        #     df = df.replace(to_replace=9999, value='None') 
 
         df = df.drop_duplicates(subset = "site_number")
         df = df.reset_index()
-        df[param] = True
 
-        return df[['site_number', 'local_site_name', 'county_code', param]]
+        return df[['site_number', 'local_site_name', 'county_code', 'latitude','longitude', 'open_date', 'close_date']]
     
     def best_sites_state(self, state, byear, eyear=None, mandatory_param='PM2.5 - Local Conditions', verbose=False):
         """
@@ -85,8 +84,14 @@ class findSites():
             return dfs
         found_params = [mandatory_param]
 
-        # starts dictionary for the aggregation function later
-        param_dict = {mandatory_param : 'sum'}
+        # # starts dictionary for the aggregation function later
+        # param_dict = {mandatory_param : 'sum'}
+
+        # # aggregates all data together
+        # mini_func = {'local_site_name': 'first', 'county_code': 'first'}
+        # aggregation_functions = {**mini_func}#, **param_dict}
+        # dfs = dfs.groupby(dfs['site_number']).aggregate(aggregation_functions)
+        dfs.set_index('site_number',inplace=True)
 
         # makes sure mandatory variable is hourly
         for param in [mandatory_param]:
@@ -100,11 +105,17 @@ class findSites():
                 annual_df = annual_df[annual_df['sample_duration'] == '1 HOUR']
                 if annual_df.empty:
                     dfs.drop(labels=[index], axis=0, inplace=True)
+                else:
+                    pass
+                    # dfs.insert(-1, '')
             
             if dfs.empty:
                 print(f"No hourly data found for state {state} for mandatory parameter {param}")
                 # returns an empty dataframe 
                 return dfs
+
+        dfs.sort_values(by='open_date',inplace=True)
+        dfs.reset_index(inplace=True)
 
         return dfs
 
@@ -133,7 +144,7 @@ class findSites():
 
             if not df.empty:
                 # weeds out anything with less than 6 features 
-                df = df[df['total_params'] >= 6]
+                # df = df[df['total_params'] >= 6]
 
                 # adds state identifying information
                 df.insert(0, 'state_name', row['state_name'])
