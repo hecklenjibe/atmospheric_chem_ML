@@ -181,6 +181,8 @@ class findSites():
         for index, row in df.iterrows():
             df.at[index,'climate_zone'] = CLIMATE_ZONES[row['state_name']]
 
+        df.reset_index(inplace = True)
+
         return df
 
     # def search_usa(self, year):
